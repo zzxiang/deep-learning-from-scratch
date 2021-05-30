@@ -60,13 +60,18 @@ class TwoLayerNet:
         
         batch_num = x.shape[0]
         
-        # forward
+        ## forward
         a1 = np.dot(x, W1) + b1
         z1 = sigmoid(a1)
         a2 = np.dot(z1, W2) + b2
         y = softmax(a2)
         
-        # backward
+        ## backward
+        # dyはSoftmax-with-Lossレイヤの逆伝播です
+        # y - tについは付録A.2ステップ6を参考
+        # batch_numで割らないとgrads['W2']とgrads['b2']はともに大きくなる
+        # 本質的な理由として、loss関数に呼ばれるcross_entropy_errorは戻り値をbatch_numで割るのです
+        # 参考：https://qiita.com/segavvy/items/8707e4e65aa7fa357d8a#563-softmax-with-loss%E3%83%AC%E3%82%A4%E3%83%A4
         dy = (y - t) / batch_num
         grads['W2'] = np.dot(z1.T, dy)
         grads['b2'] = np.sum(dy, axis=0)
